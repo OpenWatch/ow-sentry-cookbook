@@ -7,14 +7,7 @@
 # Licensed under AGPLv3
 #
 
-secrets = Chef::EncryptedDataBagItem.load(node['ow_etherpad']['secret_databag_name'] , node['ow_etherpad']['secret_databag_item_name'])
-
-node.set['sentry']['key'] = "asdf"
-
-node.set['sentry']['superusers'] = [{
-                 "username" => "a",
-                 "password" => "a",
-                 "email" => "a@a.com"}]
+#secrets = Chef::EncryptedDataBagItem.load(node['ow_sentry']['secret_databag_name'] , node['ow_sentry']['secret_databag_item_name'])
 
 
 include_recipe "sentry::instance"
