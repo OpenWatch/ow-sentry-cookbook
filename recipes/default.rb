@@ -40,7 +40,8 @@ template node['nginx']['dir'] + "/sites-enabled/ow_sentry.nginx" do
 end
 
 
-users_bag = Chef::EncryptedDataBagItem.load(node['ow_sentry']['secret_databag_name'] , node['ow_sentry']['secret_databag_item_name'])
+users_bag = Chef::EncryptedDataBagItem.load(node['ow_sentry']['secret_databag_name'] , node['ow_sentry']['users_databag_item_name'])
+secrets_bag = Chef::EncryptedDataBagItem.load(node['ow_sentry']['secret_databag_name'] , node['ow_sentry']['secrets_databag_item_name'])
 users = users_bag["users"]
 
 db_user = node['ow_sentry']['db_user']
@@ -74,7 +75,20 @@ node.set["sentry"]["settings"]["databases"] = {
     "PORT" => "#{db_port}"
   }}
 
-# node.save
+domain = node['ow_sentry']['domain']
+
+node.set["sentry"]["settings"]["prefix"] = "https://#{domain}"
+node.set["sentry"]["settings"]["private_key"] = secrets_bag["private_key"]
+
+web_settings = {
+  "host" => "127.0.0.1",
+  "port" => 9000,
+  "options" => {
+    "workers" => 3,
+    #"worker_class": "gevent"
+  }}
+node.set["sentry"]["settings"]["web"] = web_settings
+node.set["sentry"]["web"] = web_settings # Not sure why he sets it in two places
 
 include_recipe "sentry::instance"
 
