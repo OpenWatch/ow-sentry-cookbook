@@ -7,38 +7,6 @@
 # Licensed under AGPLv3
 #
 
-ssl_dir = node['ow_webserver']['ssl_dir'] 
-ssl_cert = node['ow_webserver']['ssl_cert']
-ssl_key = node['ow_webserver']['ssl_key']
-
-# Make log dir
-directory node['ow_sentry']['log_dir'] do
-  owner node['nginx']['user']
-  group node['nginx']['group']
-  recursive true
-  action :create
-end
-
-# Nginx config file
-template node['nginx']['dir'] + "/sites-enabled/ow_sentry.nginx" do
-    source "ow_sentry.nginx.erb"
-    owner node['nginx']['user']
-    group node['nginx']['group']
-    variables({
-    :http_listen_port => node['ow_sentry']['http_listen_port'],
-    :https_listen_port => node['ow_sentry']['https_listen_port'],
-    :domain => node['ow_sentry']['domain'],
-    :internal_port => node['ow_sentry']['internal_port'],
-    :ssl_cert => ssl_dir + ssl_cert,
-    :ssl_key => ssl_dir + ssl_key,
-    :app_root => node['ow_sentry']['app_root'],
-    :access_log => node['ow_sentry']['log_dir'] + node['ow_sentry']['access_log'],
-    :error_log => node['ow_sentry']['log_dir'] + node['ow_sentry']['error_log'],
-    })
-    notifies :restart, "service[nginx]"
-    action :create
-end
-
 
 users_bag = Chef::EncryptedDataBagItem.load(node['ow_sentry']['secret_databag_name'] , node['ow_sentry']['users_databag_item_name'])
 secrets_bag = Chef::EncryptedDataBagItem.load(node['ow_sentry']['secret_databag_name'] , node['ow_sentry']['secrets_databag_item_name'])
@@ -91,4 +59,36 @@ node.set["sentry"]["settings"]["web"] = web_settings
 node.set["sentry"]["web"] = web_settings # Not sure why he sets it in two places
 
 include_recipe "sentry::instance"
+
+ssl_dir = node['ow_webserver']['ssl_dir'] 
+ssl_cert = node['ow_webserver']['ssl_cert']
+ssl_key = node['ow_webserver']['ssl_key']
+
+# Make log dir
+directory node['ow_sentry']['log_dir'] do
+  owner node['nginx']['user']
+  group node['nginx']['group']
+  recursive true
+  action :create
+end
+
+# Nginx config file
+template node['nginx']['dir'] + "/sites-enabled/ow_sentry.nginx" do
+    source "ow_sentry.nginx.erb"
+    owner node['nginx']['user']
+    group node['nginx']['group']
+    variables({
+    :http_listen_port => node['ow_sentry']['http_listen_port'],
+    :https_listen_port => node['ow_sentry']['https_listen_port'],
+    :domain => node['ow_sentry']['domain'],
+    :internal_port => '9000',
+    :ssl_cert => ssl_dir + ssl_cert,
+    :ssl_key => ssl_dir + ssl_key,
+    :app_root => node['ow_sentry']['app_root'],
+    :access_log => node['ow_sentry']['log_dir'] + node['ow_sentry']['access_log'],
+    :error_log => node['ow_sentry']['log_dir'] + node['ow_sentry']['error_log'],
+    })
+    notifies :restart, "service[nginx]"
+    action :create
+end
 
