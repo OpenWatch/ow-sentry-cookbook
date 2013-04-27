@@ -7,6 +7,7 @@ default['ow_sentry']['db_user'] = "postgres"
 default['ow_sentry']['db_port'] = 5432
 default['ow_sentry']['db_name'] = 'sentry'
 default['ow_sentry']['log_dir'] = "/var/log/ow/"
+default['ow_sentry']['mailgun_server_name'] = "openwatch.mailgun.org"
 
 #Nginx
 default['ow_sentry']['http_listen_port'] = 80

@@ -58,6 +58,10 @@ web_settings = {
 node.set["sentry"]["settings"]["web"] = web_settings
 node.set["sentry"]["web"] = web_settings # Not sure why he sets it in two places
 
+# Mailgun
+node.set["sentry"]["settings"]["mailgun_access_key"] = secrets_bag["mailgun_api_key"]
+node.set["sentry"]["settings"]["mailgun_server_name"] = node['ow_sentry']['mailgun_server_name']
+
 include_recipe "sentry::instance"
 
 ssl_dir = node['ow_webserver']['ssl_dir'] 
